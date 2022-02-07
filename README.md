@@ -1,3 +1,1 @@
-# XMemoryMapWidget
-
-Memory Map Widgets
+# XProcessModulesWidget
