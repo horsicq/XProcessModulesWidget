@@ -23,6 +23,8 @@
 
 #include <QWidget>
 #include <QStandardItemModel>
+#include <QFuture>
+#include <QtConcurrent>
 #include "xprocess.h"
 #include "xshortcutswidget.h"
 
@@ -39,6 +41,7 @@ class XProcessModulesWidget : public XShortcutsWidget
         HEADER_COLUMN_ADDRESS=0,
         HEADER_COLUMN_SIZE,
         HEADER_COLUMN_NAME,
+        HEADER_COLUMN_FILENAME,
         __HEADER_COLUMN_size
     };
 
@@ -49,12 +52,21 @@ public:
     void setData(qint64 nProcessId);
     void reload();
 
+private:
+    void deleteOldModel();
+
 protected:
     virtual void registerShortcuts(bool bState);
+
+private slots:
+    void on_pushButtonSave_clicked();
+    void on_pushButtonReload_clicked();
 
 private:
     Ui::XProcessModulesWidget *ui;
     qint64 g_nProcessId;
+    QStandardItemModel *g_pModel;
+    QStandardItemModel *g_pOldModel;
 };
 
 #endif // XPROCESSMODULESWIDGET_H

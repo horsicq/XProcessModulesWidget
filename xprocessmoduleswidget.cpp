@@ -30,6 +30,8 @@ XProcessModulesWidget::XProcessModulesWidget(QWidget *pParent) :
     // mb TODO autorefresh
 
     g_nProcessId=0;
+    g_pModel=0;
+    g_pOldModel=0;
 }
 
 XProcessModulesWidget::~XProcessModulesWidget()
@@ -52,11 +54,87 @@ void XProcessModulesWidget::reload()
 
     if(g_nProcessId)
     {
+        g_pOldModel=g_pModel;
 
+        XBinary::MODE modeAddress=XBinary::MODE_32;
+
+        if(sizeof(void *)==8)
+        {
+            modeAddress=XBinary::MODE_64;
+        }
+        else
+        {
+            modeAddress=XBinary::MODE_32;
+        }
+
+        QList<XProcess::MODULE> listModules=XProcess::getModulesList(g_nProcessId);
+
+        qint32 nNumberOfRecords=listModules.count();
+
+        g_pModel=new QStandardItemModel(nNumberOfRecords,__HEADER_COLUMN_size);
+
+        g_pModel->setHeaderData(HEADER_COLUMN_ADDRESS,Qt::Horizontal,tr("Address"));
+        g_pModel->setHeaderData(HEADER_COLUMN_SIZE,Qt::Horizontal,tr("Size"));
+        g_pModel->setHeaderData(HEADER_COLUMN_NAME,Qt::Horizontal,tr("Name"));
+        g_pModel->setHeaderData(HEADER_COLUMN_FILENAME,Qt::Horizontal,tr("File name"));
+
+        for(int i=0;i<nNumberOfRecords;i++)
+        {
+            QStandardItem *pItemAddress=new QStandardItem;
+            pItemAddress->setText(XBinary::valueToHex(modeAddress,listModules.at(i).nAddress));
+            pItemAddress->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+            g_pModel->setItem(i,HEADER_COLUMN_ADDRESS,pItemAddress);
+
+            QStandardItem *pItemSize=new QStandardItem;
+            pItemSize->setText(XBinary::valueToHex(XBinary::MODE_32,listModules.at(i).nSize));
+            pItemSize->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
+            g_pModel->setItem(i,HEADER_COLUMN_SIZE,pItemSize);
+
+            QStandardItem *pItemName=new QStandardItem;
+            pItemName->setText(listModules.at(i).sName);
+            pItemName->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+            g_pModel->setItem(i,HEADER_COLUMN_NAME,pItemName);
+
+            QStandardItem *pItemFileName=new QStandardItem;
+            pItemFileName->setText(listModules.at(i).sFileName);
+            pItemFileName->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+            g_pModel->setItem(i,HEADER_COLUMN_FILENAME,pItemFileName);
+        }
+
+        ui->tableViewModules->setModel(g_pModel);
+
+        #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+            QFuture<void> future=QtConcurrent::run(&XProcessModulesWidget::deleteOldModel,this);
+        #else
+            QFuture<void> future=QtConcurrent::run(this,&XProcessModulesWidget::deleteOldModel);
+        #endif
+    }
+}
+
+void XProcessModulesWidget::deleteOldModel()
+{
+    if(g_pOldModel)
+    {
+        delete g_pOldModel;
+
+        g_pOldModel=0;
     }
 }
 
 void XProcessModulesWidget::registerShortcuts(bool bState)
 {
     Q_UNUSED(bState)
+}
+
+void XProcessModulesWidget::on_pushButtonSave_clicked()
+{
+    if(g_pModel)
+    {
+        XShortcutsWidget::saveModel(g_pModel,QString("%1.txt").arg(tr("Modules")));
+    }
+}
+
+void XProcessModulesWidget::on_pushButtonReload_clicked()
+{
+    reload();
 }
