@@ -61,6 +61,7 @@ protected:
 private slots:
     void on_pushButtonSave_clicked();
     void on_pushButtonReload_clicked();
+    void on_tableViewModules_customContextMenuRequested(const QPoint &pos);
 
 private:
     Ui::XProcessModulesWidget *ui;

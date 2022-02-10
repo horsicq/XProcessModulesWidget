@@ -138,3 +138,9 @@ void XProcessModulesWidget::on_pushButtonReload_clicked()
 {
     reload();
 }
+
+void XProcessModulesWidget::on_tableViewModules_customContextMenuRequested(const QPoint &pos)
+{
+    // TODO
+}
+
