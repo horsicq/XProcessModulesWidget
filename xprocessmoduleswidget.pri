@@ -2,12 +2,15 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 FORMS += \
+    $$PWD/dialogxprocessmodules.ui \
     $$PWD/xprocessmoduleswidget.ui
 
 HEADERS += \
+    $$PWD/dialogxprocessmodules.h \
     $$PWD/xprocessmoduleswidget.h
 
 SOURCES += \
+    $$PWD/dialogxprocessmodules.cpp \
     $$PWD/xprocessmoduleswidget.cpp
 
 !contains(XCONFIG, xprocess) {
