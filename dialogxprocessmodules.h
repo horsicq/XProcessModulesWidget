@@ -32,8 +32,13 @@ class DialogXProcessModules : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogXProcessModules(QWidget *parent = nullptr);
+    explicit DialogXProcessModules(QWidget *pParent=nullptr);
     ~DialogXProcessModules();
+
+    void setData(qint64 nProcessId);
+
+private slots:
+    void on_pushButtonOK_clicked();
 
 private:
     Ui::DialogXProcessModules *ui;
