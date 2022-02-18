@@ -32,6 +32,8 @@ XProcessModulesWidget::XProcessModulesWidget(QWidget *pParent) :
     g_nProcessId=0;
     g_pModel=0;
     g_pOldModel=0;
+
+    memset(shortCuts,0,sizeof shortCuts);
 }
 
 XProcessModulesWidget::~XProcessModulesWidget()
@@ -82,6 +84,8 @@ void XProcessModulesWidget::reload()
         {
             QStandardItem *pItemAddress=new QStandardItem;
             pItemAddress->setText(XBinary::valueToHex(modeAddress,listModules.at(i).nAddress));
+            pItemAddress->setData(listModules.at(i).nAddress,Qt::UserRole+USERROLE_ADDRESS);
+            pItemAddress->setData(listModules.at(i).nSize,Qt::UserRole+USERROLE_SIZE);
             pItemAddress->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
             g_pModel->setItem(i,HEADER_COLUMN_ADDRESS,pItemAddress);
 
@@ -123,7 +127,21 @@ void XProcessModulesWidget::deleteOldModel()
 
 void XProcessModulesWidget::registerShortcuts(bool bState)
 {
-    Q_UNUSED(bState)
+    if(bState)
+    {
+        if(!shortCuts[SC_DUMPTOFILE])               shortCuts[SC_DUMPTOFILE]                =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_MODULES_DUMPTOFILE),            this,SLOT(_dumpToFileSlot()));
+    }
+    else
+    {
+        for(qint32 i=0;i<__SC_SIZE;i++)
+        {
+            if(shortCuts[i])
+            {
+                delete shortCuts[i];
+                shortCuts[i]=nullptr;
+            }
+        }
+    }
 }
 
 void XProcessModulesWidget::on_pushButtonSave_clicked()
@@ -141,6 +159,43 @@ void XProcessModulesWidget::on_pushButtonReload_clicked()
 
 void XProcessModulesWidget::on_tableViewModules_customContextMenuRequested(const QPoint &pos)
 {
-    // TODO
+    QMenu contextMenu(this);
+
+    QAction actionDumpToFile(tr("Dump to file"),this);
+    actionDumpToFile.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_MODULES_DUMPTOFILE));
+    connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFileSlot()));
+
+    contextMenu.addAction(&actionDumpToFile);
+
+    contextMenu.exec(ui->tableViewModules->viewport()->mapToGlobal(pos));
 }
 
+void XProcessModulesWidget::_dumpToFileSlot()
+{
+    QString sSaveFileName=QString("%1.bin").arg(tr("Dump")); // TODO rename
+    QString sFileName=QFileDialog::getSaveFileName(this,tr("Save dump"),sSaveFileName,QString("%1 (*.bin)").arg(tr("Raw data")));
+
+    if(!sFileName.isEmpty())
+    {
+        qint32 nRow=ui->tableViewModules->currentIndex().row();
+
+        if((nRow!=-1)&&(g_pModel))
+        {
+            QModelIndex index=ui->tableViewModules->selectionModel()->selectedIndexes().at(0);
+
+            quint64 nAddress=ui->tableViewModules->model()->data(index,Qt::UserRole+USERROLE_ADDRESS).toString().toULongLong(0,16);
+            quint64 nSize=ui->tableViewModules->model()->data(index,Qt::UserRole+USERROLE_SIZE).toString().toULongLong(0,16);
+
+            XProcessDevice pd;
+
+            if(pd.openPID(g_nProcessId,nAddress,nSize,QIODevice::ReadOnly))
+            {
+                DialogDumpProcess dd(this,&pd,0,nSize,sFileName,DumpProcess::DT_OFFSET);
+
+                dd.exec();
+
+                pd.close();
+            }
+        }
+    }
+}

@@ -21,11 +21,14 @@
 #ifndef XPROCESSMODULESWIDGET_H
 #define XPROCESSMODULESWIDGET_H
 
+#include <QMenu>
 #include <QWidget>
 #include <QStandardItemModel>
 #include <QFuture>
 #include <QtConcurrent>
+#include "dialogdumpprocess.h"
 #include "xprocess.h"
+#include "xprocessdevice.h"
 #include "xshortcutswidget.h"
 
 namespace Ui {
@@ -43,6 +46,18 @@ class XProcessModulesWidget : public XShortcutsWidget
         HEADER_COLUMN_NAME,
         HEADER_COLUMN_FILENAME,
         __HEADER_COLUMN_size
+    };
+
+    enum SC
+    {
+        SC_DUMPTOFILE=0,
+        __SC_SIZE
+    };
+
+    enum USERROLE
+    {
+        USERROLE_SIZE=0,
+        USERROLE_ADDRESS
     };
 
 public:
@@ -63,11 +78,15 @@ private slots:
     void on_pushButtonReload_clicked();
     void on_tableViewModules_customContextMenuRequested(const QPoint &pos);
 
+protected slots:
+    void _dumpToFileSlot();
+
 private:
     Ui::XProcessModulesWidget *ui;
     qint64 g_nProcessId;
     QStandardItemModel *g_pModel;
     QStandardItemModel *g_pOldModel;
+    QShortcut *shortCuts[__SC_SIZE];
 };
 
 #endif // XPROCESSMODULESWIDGET_H
