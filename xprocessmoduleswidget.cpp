@@ -45,6 +45,10 @@ void XProcessModulesWidget::setData(qint64 nProcessId)
 {
     g_nProcessId=nProcessId;
 
+#ifdef QT_DEBUG
+    qDebug("XProcessModulesWidget::setData %lld",nProcessId);
+#endif
+
     reload();
 }
 
