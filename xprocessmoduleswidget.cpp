@@ -84,7 +84,7 @@ void XProcessModulesWidget::reload()
         g_pModel->setHeaderData(HEADER_COLUMN_NAME,Qt::Horizontal,tr("Name"));
         g_pModel->setHeaderData(HEADER_COLUMN_FILENAME,Qt::Horizontal,tr("File name"));
 
-        for(int i=0;i<nNumberOfRecords;i++)
+        for(qint32 i=0;i<nNumberOfRecords;i++)
         {
             QStandardItem *pItemAddress=new QStandardItem;
             pItemAddress->setText(XBinary::valueToHex(modeAddress,listModules.at(i).nAddress));
