@@ -30,8 +30,8 @@ XProcessModulesWidget::XProcessModulesWidget(QWidget *pParent) :
     // mb TODO autorefresh
 
     g_nProcessId=0;
-    g_pModel=0;
-    g_pOldModel=0;
+    g_pModel=nullptr;
+    g_pOldModel=nullptr;
 
     memset(shortCuts,0,sizeof shortCuts);
 }
