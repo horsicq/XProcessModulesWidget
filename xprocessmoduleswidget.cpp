@@ -73,7 +73,7 @@ void XProcessModulesWidget::reload()
             modeAddress=XBinary::MODE_32;
         }
 
-        QList<XProcess::MODULE> listModules=XProcess::getModulesList(g_nProcessId);
+        QList<XBinary::MODULE> listModules=XProcess::getModulesList(g_nProcessId);
 
         qint32 nNumberOfRecords=listModules.count();
 
