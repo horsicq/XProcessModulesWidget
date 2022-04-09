@@ -41,7 +41,7 @@ XProcessModulesWidget::~XProcessModulesWidget()
     delete ui;
 }
 
-void XProcessModulesWidget::setData(qint64 nProcessId)
+void XProcessModulesWidget::setData(qint64 nProcessId,bool bReload)
 {
     g_nProcessId=nProcessId;
 
@@ -49,7 +49,10 @@ void XProcessModulesWidget::setData(qint64 nProcessId)
     qDebug("XProcessModulesWidget::setData %lld",nProcessId);
 #endif
 
-    reload();
+    if(bReload)
+    {
+        reload();
+    }
 }
 
 void XProcessModulesWidget::reload()

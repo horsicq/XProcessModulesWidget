@@ -63,7 +63,7 @@ public:
     explicit XProcessModulesWidget(QWidget *pParent=nullptr);
     ~XProcessModulesWidget();
 
-    void setData(qint64 nProcessId);
+    void setData(qint64 nProcessId,bool bReload=true);
     void reload();
 
 private:
