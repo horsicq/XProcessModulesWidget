@@ -30,6 +30,7 @@ XProcessModulesWidget::XProcessModulesWidget(QWidget *pParent) :
     // mb TODO autorefresh
 
     g_nProcessId=0;
+    g_pXInfoDB=nullptr;
     g_pModel=nullptr;
     g_pOldModel=nullptr;
 
@@ -55,13 +56,34 @@ void XProcessModulesWidget::setData(qint64 nProcessId,bool bReload)
     }
 }
 
+void XProcessModulesWidget::setData(XInfoDB *pXInfoDB,bool bReload)
+{
+    g_pXInfoDB=pXInfoDB;
+
+    if(bReload)
+    {
+        reload();
+    }
+}
+
 void XProcessModulesWidget::reload()
 {
 #ifdef QT_DEBUG
     qDebug("void XProcessModulesWidget::reload()");
 #endif
 
+    QList<XProcess::MODULE> listModules;
+
     if(g_nProcessId)
+    {
+        listModules=XProcess::getModulesList(g_nProcessId);
+    }
+    else if(g_pXInfoDB)
+    {
+        listModules=*(g_pXInfoDB->getCurrentModulesList()); // TODO optimize
+    }
+
+    if(g_nProcessId||g_pXInfoDB)
     {
         g_pOldModel=g_pModel;
 
@@ -75,8 +97,6 @@ void XProcessModulesWidget::reload()
         {
             modeAddress=XBinary::MODE_32;
         }
-
-        QList<XBinary::MODULE> listModules=XProcess::getModulesList(g_nProcessId);
 
         qint32 nNumberOfRecords=listModules.count();
 
