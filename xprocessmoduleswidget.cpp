@@ -73,14 +73,16 @@ void XProcessModulesWidget::reload()
 #endif
 
     QList<XProcess::MODULE> listModules;
+    QList<XProcess::MODULE> *pListModules=nullptr;
 
     if(g_nProcessId)
     {
         listModules=XProcess::getModulesList(g_nProcessId);
+        pListModules=&listModules;
     }
     else if(g_pXInfoDB)
     {
-        listModules=*(g_pXInfoDB->getCurrentModulesList()); // TODO optimize
+        pListModules=g_pXInfoDB->getCurrentModulesList();
     }
 
     if(g_nProcessId||g_pXInfoDB)
@@ -98,7 +100,7 @@ void XProcessModulesWidget::reload()
             modeAddress=XBinary::MODE_32;
         }
 
-        qint32 nNumberOfRecords=listModules.count();
+        qint32 nNumberOfRecords=pListModules->count();
 
         g_pModel=new QStandardItemModel(nNumberOfRecords,__HEADER_COLUMN_size);
 
@@ -110,24 +112,24 @@ void XProcessModulesWidget::reload()
         for(qint32 i=0;i<nNumberOfRecords;i++)
         {
             QStandardItem *pItemAddress=new QStandardItem;
-            pItemAddress->setText(XBinary::valueToHex(modeAddress,listModules.at(i).nAddress));
-            pItemAddress->setData(listModules.at(i).nAddress,Qt::UserRole+USERROLE_ADDRESS);
-            pItemAddress->setData(listModules.at(i).nSize,Qt::UserRole+USERROLE_SIZE);
+            pItemAddress->setText(XBinary::valueToHex(modeAddress,pListModules->at(i).nAddress));
+            pItemAddress->setData(pListModules->at(i).nAddress,Qt::UserRole+USERROLE_ADDRESS);
+            pItemAddress->setData(pListModules->at(i).nSize,Qt::UserRole+USERROLE_SIZE);
             pItemAddress->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
             g_pModel->setItem(i,HEADER_COLUMN_ADDRESS,pItemAddress);
 
             QStandardItem *pItemSize=new QStandardItem;
-            pItemSize->setText(XBinary::valueToHex(XBinary::MODE_32,listModules.at(i).nSize));
+            pItemSize->setText(XBinary::valueToHex(XBinary::MODE_32,pListModules->at(i).nSize));
             pItemSize->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
             g_pModel->setItem(i,HEADER_COLUMN_SIZE,pItemSize);
 
             QStandardItem *pItemName=new QStandardItem;
-            pItemName->setText(listModules.at(i).sName);
+            pItemName->setText(pListModules->at(i).sName);
             pItemName->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
             g_pModel->setItem(i,HEADER_COLUMN_NAME,pItemName);
 
             QStandardItem *pItemFileName=new QStandardItem;
-            pItemFileName->setText(listModules.at(i).sFileName);
+            pItemFileName->setText(pListModules->at(i).sFileName);
             pItemFileName->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
             g_pModel->setItem(i,HEADER_COLUMN_FILENAME,pItemFileName);
         }
