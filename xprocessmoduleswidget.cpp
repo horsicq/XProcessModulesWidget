@@ -56,7 +56,7 @@ void XProcessModulesWidget::setData(qint64 nProcessId,bool bReload)
     }
 }
 
-void XProcessModulesWidget::setData(XInfoDB *pXInfoDB,bool bReload)
+void XProcessModulesWidget::setXInfoDB(XInfoDB *pXInfoDB,bool bReload)
 {
     g_pXInfoDB=pXInfoDB;
 
