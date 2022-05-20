@@ -158,7 +158,7 @@ void XProcessModulesWidget::registerShortcuts(bool bState)
 {
     if(bState)
     {
-        if(!shortCuts[SC_DUMPTOFILE])               shortCuts[SC_DUMPTOFILE]                =new QShortcut(getShortcuts()->getShortcut(XShortcuts::ID_MODULES_DUMPTOFILE),            this,SLOT(_dumpToFileSlot()));
+        if(!shortCuts[SC_DUMPTOFILE])               shortCuts[SC_DUMPTOFILE]                =new QShortcut(getShortcuts()->getShortcut(X_ID_MODULES_DUMPTOFILE),            this,SLOT(_dumpToFileSlot()));
     }
     else
     {
@@ -191,7 +191,7 @@ void XProcessModulesWidget::on_tableViewModules_customContextMenuRequested(const
     QMenu contextMenu(this);
 
     QAction actionDumpToFile(tr("Dump to file"),this);
-    actionDumpToFile.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_MODULES_DUMPTOFILE));
+    actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_MODULES_DUMPTOFILE));
     connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFileSlot()));
 
     contextMenu.addAction(&actionDumpToFile);
