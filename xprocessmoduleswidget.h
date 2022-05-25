@@ -24,6 +24,7 @@
 #include <QMenu>
 #include <QWidget>
 #include <QStandardItemModel>
+#include <QDesktopServices>
 #include <QFuture>
 #include <QtConcurrent>
 #include "dialogdumpprocess.h"
@@ -51,13 +52,15 @@ class XProcessModulesWidget : public XShortcutsWidget
     enum SC
     {
         SC_DUMPTOFILE=0,
+        SC_SHOWIN_FOLDER,
         __SC_SIZE
     };
 
     enum USERROLE
     {
         USERROLE_SIZE=0,
-        USERROLE_ADDRESS
+        USERROLE_ADDRESS,
+        USERROLE_FILENAME
     };
 
 public:
@@ -81,6 +84,7 @@ private slots:
 
 protected slots:
     void _dumpToFileSlot();
+    void _showInFolderSlot();
 
 private:
     Ui::XProcessModulesWidget *ui;

@@ -115,6 +115,7 @@ void XProcessModulesWidget::reload()
             pItemAddress->setText(XBinary::valueToHex(modeAddress,pListModules->at(i).nAddress));
             pItemAddress->setData(pListModules->at(i).nAddress,Qt::UserRole+USERROLE_ADDRESS);
             pItemAddress->setData(pListModules->at(i).nSize,Qt::UserRole+USERROLE_SIZE);
+            pItemAddress->setData(pListModules->at(i).sFileName,Qt::UserRole+USERROLE_FILENAME);
             pItemAddress->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
             g_pModel->setItem(i,HEADER_COLUMN_ADDRESS,pItemAddress);
 
@@ -159,6 +160,7 @@ void XProcessModulesWidget::registerShortcuts(bool bState)
     if(bState)
     {
         if(!shortCuts[SC_DUMPTOFILE])               shortCuts[SC_DUMPTOFILE]                =new QShortcut(getShortcuts()->getShortcut(X_ID_MODULES_DUMPTOFILE),            this,SLOT(_dumpToFileSlot()));
+        if(!shortCuts[SC_SHOWIN_FOLDER])            shortCuts[SC_SHOWIN_FOLDER]             =new QShortcut(getShortcuts()->getShortcut(X_ID_MODULES_SHOWIN_FOLDER),         this,SLOT(_showInFolderSlot()));
     }
     else
     {
@@ -188,15 +190,25 @@ void XProcessModulesWidget::on_pushButtonReload_clicked()
 
 void XProcessModulesWidget::on_tableViewModules_customContextMenuRequested(const QPoint &pos)
 {
-    QMenu contextMenu(this);
+    QMenu menuContext(this);
+
+    QMenu menuShowIn(tr("Show in"),this);
 
     QAction actionDumpToFile(tr("Dump to file"),this);
     actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_MODULES_DUMPTOFILE));
     connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFileSlot()));
 
-    contextMenu.addAction(&actionDumpToFile);
+    QAction actionShowInFolder(tr("Folder"),this);
+    actionShowInFolder.setShortcut(getShortcuts()->getShortcut(X_ID_MODULES_SHOWIN_FOLDER));
+    connect(&actionShowInFolder,SIGNAL(triggered()),this,SLOT(_showInFolderSlot()));
 
-    contextMenu.exec(ui->tableViewModules->viewport()->mapToGlobal(pos));
+    menuContext.addAction(&actionDumpToFile);
+
+    menuShowIn.addAction(&actionShowInFolder);
+
+    menuContext.addMenu(&menuShowIn);
+
+    menuContext.exec(ui->tableViewModules->viewport()->mapToGlobal(pos));
 }
 
 void XProcessModulesWidget::_dumpToFileSlot()
@@ -226,5 +238,19 @@ void XProcessModulesWidget::_dumpToFileSlot()
                 pd.close();
             }
         }
+    }
+}
+
+void XProcessModulesWidget::_showInFolderSlot()
+{
+    qint32 nRow=ui->tableViewModules->currentIndex().row();
+
+    if((nRow!=-1)&&(g_pModel))
+    {
+        QModelIndex index=ui->tableViewModules->selectionModel()->selectedIndexes().at(0);
+
+        QString sFilePath=ui->tableViewModules->model()->data(index,Qt::UserRole+USERROLE_FILENAME).toString();
+
+        XOptions::showInFolder(sFilePath);
     }
 }
