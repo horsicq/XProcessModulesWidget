@@ -137,21 +137,7 @@ void XProcessModulesWidget::reload()
 
         ui->tableViewModules->setModel(g_pModel);
 
-        #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
-            QFuture<void> future=QtConcurrent::run(&XProcessModulesWidget::deleteOldModel,this);
-        #else
-            QFuture<void> future=QtConcurrent::run(this,&XProcessModulesWidget::deleteOldModel);
-        #endif
-    }
-}
-
-void XProcessModulesWidget::deleteOldModel()
-{
-    if(g_pOldModel)
-    {
-        delete g_pOldModel;
-
-        g_pOldModel=0;
+        deleteOldModel(&g_pOldModel);
     }
 }
 
