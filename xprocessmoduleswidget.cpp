@@ -137,7 +137,7 @@ void XProcessModulesWidget::reload()
 
         ui->tableViewModules->setModel(g_pModel);
 
-        deleteOldModel(&g_pOldModel);
+        deleteOldStandardModel(&g_pOldModel);
     }
 }
 
