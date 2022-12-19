@@ -165,7 +165,7 @@ void XProcessModulesWidget::on_pushButtonSave_clicked()
 {
     if(g_pModel)
     {
-        XShortcutsWidget::saveModel(g_pModel,QString("%1.txt").arg(tr("Modules")));
+        XShortcutsWidget::saveTableModel(g_pModel,QString("%1.txt").arg(tr("Modules")));
     }
 }
 
