@@ -77,6 +77,7 @@ void XProcessModulesWidget::reload()
 
     if(g_nProcessId)
     {
+        // TODO Process Dialog
         listModules=XProcess::getModulesList(g_nProcessId);
         pListModules=&listModules;
     }
