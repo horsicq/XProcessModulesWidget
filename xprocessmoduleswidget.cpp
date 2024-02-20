@@ -190,9 +190,7 @@ void XProcessModulesWidget::on_tableViewModules_customContextMenuRequested(const
     connect(&actionShowInFolder,SIGNAL(triggered()),this,SLOT(_showInFolderSlot()));
 
     menuContext.addAction(&actionDumpToFile);
-
     menuShowIn.addAction(&actionShowInFolder);
-
     menuContext.addMenu(&menuShowIn);
 
     menuContext.exec(ui->tableViewModules->viewport()->mapToGlobal(pos));
@@ -218,9 +216,10 @@ void XProcessModulesWidget::_dumpToFileSlot()
 
             if(pd.open(QIODevice::ReadOnly))
             {
-                DialogDumpProcess dd(this,&pd,0,nSize,sFileName,DumpProcess::DT_OFFSET);
+                DialogDumpProcess dd(this);
+                dd.setData(&pd, 0, nSize, sFileName, DumpProcess::DT_DUMP_OFFSET);
 
-                dd.exec();
+                dd.showDialogDelay();
 
                 pd.close();
             }
