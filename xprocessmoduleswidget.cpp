@@ -21,20 +21,18 @@
 #include "xprocessmoduleswidget.h"
 #include "ui_xprocessmoduleswidget.h"
 
-XProcessModulesWidget::XProcessModulesWidget(QWidget *pParent) :
-    XShortcutsWidget(pParent),
-    ui(new Ui::XProcessModulesWidget)
+XProcessModulesWidget::XProcessModulesWidget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::XProcessModulesWidget)
 {
     ui->setupUi(this);
 
     // mb TODO autorefresh
 
-    g_nProcessId=0;
-    g_pXInfoDB=nullptr;
-    g_pModel=nullptr;
-    g_pOldModel=nullptr;
+    g_nProcessId = 0;
+    g_pXInfoDB = nullptr;
+    g_pModel = nullptr;
+    g_pOldModel = nullptr;
 
-    memset(shortCuts,0,sizeof shortCuts);
+    memset(shortCuts, 0, sizeof shortCuts);
 }
 
 XProcessModulesWidget::~XProcessModulesWidget()
@@ -42,26 +40,24 @@ XProcessModulesWidget::~XProcessModulesWidget()
     delete ui;
 }
 
-void XProcessModulesWidget::setData(qint64 nProcessId,bool bReload)
+void XProcessModulesWidget::setData(qint64 nProcessId, bool bReload)
 {
-    g_nProcessId=nProcessId;
+    g_nProcessId = nProcessId;
 
 #ifdef QT_DEBUG
-    qDebug("XProcessModulesWidget::setData %lld",nProcessId);
+    qDebug("XProcessModulesWidget::setData %lld", nProcessId);
 #endif
 
-    if(bReload)
-    {
+    if (bReload) {
         reload();
     }
 }
 
-void XProcessModulesWidget::setXInfoDB(XInfoDB *pXInfoDB,bool bReload)
+void XProcessModulesWidget::setXInfoDB(XInfoDB *pXInfoDB, bool bReload)
 {
-    g_pXInfoDB=pXInfoDB;
+    g_pXInfoDB = pXInfoDB;
 
-    if(bReload)
-    {
+    if (bReload) {
         reload();
     }
 }
@@ -73,67 +69,59 @@ void XProcessModulesWidget::reload()
 #endif
 
     QList<XProcess::MODULE> listModules;
-    QList<XProcess::MODULE> *pListModules=nullptr;
+    QList<XProcess::MODULE> *pListModules = nullptr;
 
-    if(g_nProcessId)
-    {
+    if (g_nProcessId) {
         // TODO Process Dialog
-        listModules=XProcess::getModulesList(g_nProcessId);
-        pListModules=&listModules;
-    }
-    else if(g_pXInfoDB)
-    {
-        pListModules=g_pXInfoDB->getCurrentModulesList();
+        listModules = XProcess::getModulesList(g_nProcessId);
+        pListModules = &listModules;
+    } else if (g_pXInfoDB) {
+        pListModules = g_pXInfoDB->getCurrentModulesList();
     }
 
-    if(g_nProcessId||g_pXInfoDB)
-    {
-        g_pOldModel=g_pModel;
+    if (g_nProcessId || g_pXInfoDB) {
+        g_pOldModel = g_pModel;
 
-        XBinary::MODE modeAddress=XBinary::MODE_32;
+        XBinary::MODE modeAddress = XBinary::MODE_32;
 
-        if(sizeof(void *)==8)
-        {
-            modeAddress=XBinary::MODE_64;
-        }
-        else
-        {
-            modeAddress=XBinary::MODE_32;
+        if (sizeof(void *) == 8) {
+            modeAddress = XBinary::MODE_64;
+        } else {
+            modeAddress = XBinary::MODE_32;
         }
 
-        qint32 nNumberOfRecords=pListModules->count();
+        qint32 nNumberOfRecords = pListModules->count();
 
-        g_pModel=new QStandardItemModel(nNumberOfRecords,__HEADER_COLUMN_size);
+        g_pModel = new QStandardItemModel(nNumberOfRecords, __HEADER_COLUMN_size);
 
-        g_pModel->setHeaderData(HEADER_COLUMN_ADDRESS,Qt::Horizontal,tr("Address"));
-        g_pModel->setHeaderData(HEADER_COLUMN_SIZE,Qt::Horizontal,tr("Size"));
-        g_pModel->setHeaderData(HEADER_COLUMN_NAME,Qt::Horizontal,tr("Name"));
-        g_pModel->setHeaderData(HEADER_COLUMN_FILENAME,Qt::Horizontal,tr("File name"));
+        g_pModel->setHeaderData(HEADER_COLUMN_ADDRESS, Qt::Horizontal, tr("Address"));
+        g_pModel->setHeaderData(HEADER_COLUMN_SIZE, Qt::Horizontal, tr("Size"));
+        g_pModel->setHeaderData(HEADER_COLUMN_NAME, Qt::Horizontal, tr("Name"));
+        g_pModel->setHeaderData(HEADER_COLUMN_FILENAME, Qt::Horizontal, tr("File name"));
 
-        for(qint32 i=0;i<nNumberOfRecords;i++)
-        {
-            QStandardItem *pItemAddress=new QStandardItem;
-            pItemAddress->setText(XBinary::valueToHex(modeAddress,pListModules->at(i).nAddress));
-            pItemAddress->setData(pListModules->at(i).nAddress,Qt::UserRole+USERROLE_ADDRESS);
-            pItemAddress->setData(pListModules->at(i).nSize,Qt::UserRole+USERROLE_SIZE);
-            pItemAddress->setData(pListModules->at(i).sFileName,Qt::UserRole+USERROLE_FILENAME);
-            pItemAddress->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-            g_pModel->setItem(i,HEADER_COLUMN_ADDRESS,pItemAddress);
+        for (qint32 i = 0; i < nNumberOfRecords; i++) {
+            QStandardItem *pItemAddress = new QStandardItem;
+            pItemAddress->setText(XBinary::valueToHex(modeAddress, pListModules->at(i).nAddress));
+            pItemAddress->setData(pListModules->at(i).nAddress, Qt::UserRole + USERROLE_ADDRESS);
+            pItemAddress->setData(pListModules->at(i).nSize, Qt::UserRole + USERROLE_SIZE);
+            pItemAddress->setData(pListModules->at(i).sFileName, Qt::UserRole + USERROLE_FILENAME);
+            pItemAddress->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            g_pModel->setItem(i, HEADER_COLUMN_ADDRESS, pItemAddress);
 
-            QStandardItem *pItemSize=new QStandardItem;
-            pItemSize->setText(XBinary::valueToHex(XBinary::MODE_32,pListModules->at(i).nSize));
-            pItemSize->setTextAlignment(Qt::AlignRight|Qt::AlignVCenter);
-            g_pModel->setItem(i,HEADER_COLUMN_SIZE,pItemSize);
+            QStandardItem *pItemSize = new QStandardItem;
+            pItemSize->setText(XBinary::valueToHex(XBinary::MODE_32, pListModules->at(i).nSize));
+            pItemSize->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            g_pModel->setItem(i, HEADER_COLUMN_SIZE, pItemSize);
 
-            QStandardItem *pItemName=new QStandardItem;
+            QStandardItem *pItemName = new QStandardItem;
             pItemName->setText(pListModules->at(i).sName);
-            pItemName->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-            g_pModel->setItem(i,HEADER_COLUMN_NAME,pItemName);
+            pItemName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+            g_pModel->setItem(i, HEADER_COLUMN_NAME, pItemName);
 
-            QStandardItem *pItemFileName=new QStandardItem;
+            QStandardItem *pItemFileName = new QStandardItem;
             pItemFileName->setText(pListModules->at(i).sFileName);
-            pItemFileName->setTextAlignment(Qt::AlignLeft|Qt::AlignVCenter);
-            g_pModel->setItem(i,HEADER_COLUMN_FILENAME,pItemFileName);
+            pItemFileName->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+            g_pModel->setItem(i, HEADER_COLUMN_FILENAME, pItemFileName);
         }
 
         ui->tableViewModules->setModel(g_pModel);
@@ -144,19 +132,15 @@ void XProcessModulesWidget::reload()
 
 void XProcessModulesWidget::registerShortcuts(bool bState)
 {
-    if(bState)
-    {
-        if(!shortCuts[SC_DUMPTOFILE])               shortCuts[SC_DUMPTOFILE]                =new QShortcut(getShortcuts()->getShortcut(X_ID_MODULES_DUMPTOFILE),            this,SLOT(_dumpToFileSlot()));
-        if(!shortCuts[SC_SHOWIN_FOLDER])            shortCuts[SC_SHOWIN_FOLDER]             =new QShortcut(getShortcuts()->getShortcut(X_ID_MODULES_SHOWIN_FOLDER),         this,SLOT(_showInFolderSlot()));
-    }
-    else
-    {
-        for(qint32 i=0;i<__SC_SIZE;i++)
-        {
-            if(shortCuts[i])
-            {
+    if (bState) {
+        if (!shortCuts[SC_DUMPTOFILE]) shortCuts[SC_DUMPTOFILE] = new QShortcut(getShortcuts()->getShortcut(X_ID_MODULES_DUMPTOFILE), this, SLOT(_dumpToFileSlot()));
+        if (!shortCuts[SC_SHOWIN_FOLDER])
+            shortCuts[SC_SHOWIN_FOLDER] = new QShortcut(getShortcuts()->getShortcut(X_ID_MODULES_SHOWIN_FOLDER), this, SLOT(_showInFolderSlot()));
+    } else {
+        for (qint32 i = 0; i < __SC_SIZE; i++) {
+            if (shortCuts[i]) {
                 delete shortCuts[i];
-                shortCuts[i]=nullptr;
+                shortCuts[i] = nullptr;
             }
         }
     }
@@ -164,9 +148,8 @@ void XProcessModulesWidget::registerShortcuts(bool bState)
 
 void XProcessModulesWidget::on_pushButtonSave_clicked()
 {
-    if(g_pModel)
-    {
-        XShortcutsWidget::saveTableModel(g_pModel,QString("%1.txt").arg(tr("Modules")));
+    if (g_pModel) {
+        XShortcutsWidget::saveTableModel(g_pModel, QString("%1.txt").arg(tr("Modules")));
     }
 }
 
@@ -179,15 +162,15 @@ void XProcessModulesWidget::on_tableViewModules_customContextMenuRequested(const
 {
     QMenu menuContext(this);
 
-    QMenu menuShowIn(tr("Show in"),this);
+    QMenu menuShowIn(tr("Show in"), this);
 
-    QAction actionDumpToFile(tr("Dump to file"),this);
+    QAction actionDumpToFile(tr("Dump to file"), this);
     actionDumpToFile.setShortcut(getShortcuts()->getShortcut(X_ID_MODULES_DUMPTOFILE));
-    connect(&actionDumpToFile,SIGNAL(triggered()),this,SLOT(_dumpToFileSlot()));
+    connect(&actionDumpToFile, SIGNAL(triggered()), this, SLOT(_dumpToFileSlot()));
 
-    QAction actionShowInFolder(tr("Folder"),this);
+    QAction actionShowInFolder(tr("Folder"), this);
     actionShowInFolder.setShortcut(getShortcuts()->getShortcut(X_ID_MODULES_SHOWIN_FOLDER));
-    connect(&actionShowInFolder,SIGNAL(triggered()),this,SLOT(_showInFolderSlot()));
+    connect(&actionShowInFolder, SIGNAL(triggered()), this, SLOT(_showInFolderSlot()));
 
     menuContext.addAction(&actionDumpToFile);
     menuShowIn.addAction(&actionShowInFolder);
@@ -198,24 +181,21 @@ void XProcessModulesWidget::on_tableViewModules_customContextMenuRequested(const
 
 void XProcessModulesWidget::_dumpToFileSlot()
 {
-    QString sSaveFileName=QString("%1.bin").arg(tr("Dump")); // TODO rename
-    QString sFileName=QFileDialog::getSaveFileName(this,tr("Save dump"),sSaveFileName,QString("%1 (*.bin)").arg(tr("Raw data")));
+    QString sSaveFileName = QString("%1.bin").arg(tr("Dump"));  // TODO rename
+    QString sFileName = QFileDialog::getSaveFileName(this, tr("Save dump"), sSaveFileName, QString("%1 (*.bin)").arg(tr("Raw data")));
 
-    if(!sFileName.isEmpty())
-    {
-        qint32 nRow=ui->tableViewModules->currentIndex().row();
+    if (!sFileName.isEmpty()) {
+        qint32 nRow = ui->tableViewModules->currentIndex().row();
 
-        if((nRow!=-1)&&(g_pModel))
-        {
-            QModelIndex index=ui->tableViewModules->selectionModel()->selectedIndexes().at(0);
+        if ((nRow != -1) && (g_pModel)) {
+            QModelIndex index = ui->tableViewModules->selectionModel()->selectedIndexes().at(0);
 
-            quint64 nAddress=ui->tableViewModules->model()->data(index,Qt::UserRole+USERROLE_ADDRESS).toString().toULongLong(0,16);
-            quint64 nSize=ui->tableViewModules->model()->data(index,Qt::UserRole+USERROLE_SIZE).toString().toULongLong(0,16);
+            quint64 nAddress = ui->tableViewModules->model()->data(index, Qt::UserRole + USERROLE_ADDRESS).toString().toULongLong(0, 16);
+            quint64 nSize = ui->tableViewModules->model()->data(index, Qt::UserRole + USERROLE_SIZE).toString().toULongLong(0, 16);
 
-            XProcess pd(g_nProcessId,nAddress,nSize);
+            XProcess pd(g_nProcessId, nAddress, nSize);
 
-            if(pd.open(QIODevice::ReadOnly))
-            {
+            if (pd.open(QIODevice::ReadOnly)) {
                 DialogDumpProcess dd(this);
                 dd.setData(&pd, 0, nSize, sFileName, DumpProcess::DT_DUMP_DEVICE_OFFSET);
 
@@ -229,13 +209,12 @@ void XProcessModulesWidget::_dumpToFileSlot()
 
 void XProcessModulesWidget::_showInFolderSlot()
 {
-    qint32 nRow=ui->tableViewModules->currentIndex().row();
+    qint32 nRow = ui->tableViewModules->currentIndex().row();
 
-    if((nRow!=-1)&&(g_pModel))
-    {
-        QModelIndex index=ui->tableViewModules->selectionModel()->selectedIndexes().at(0);
+    if ((nRow != -1) && (g_pModel)) {
+        QModelIndex index = ui->tableViewModules->selectionModel()->selectedIndexes().at(0);
 
-        QString sFilePath=ui->tableViewModules->model()->data(index,Qt::UserRole+USERROLE_FILENAME).toString();
+        QString sFilePath = ui->tableViewModules->model()->data(index, Qt::UserRole + USERROLE_FILENAME).toString();
 
         XOptions::showInFolder(sFilePath);
     }

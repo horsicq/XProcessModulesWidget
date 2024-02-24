@@ -21,9 +21,7 @@
 #include "dialogxprocessmodules.h"
 #include "ui_dialogxprocessmodules.h"
 
-DialogXProcessModules::DialogXProcessModules(QWidget *pParent) :
-    QDialog(pParent),
-    ui(new Ui::DialogXProcessModules)
+DialogXProcessModules::DialogXProcessModules(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogXProcessModules)
 {
     ui->setupUi(this);
 }
@@ -35,7 +33,7 @@ DialogXProcessModules::~DialogXProcessModules()
 
 void DialogXProcessModules::setData(qint64 nProcessId)
 {
-    QString sTitle=QString("%1: %2").arg(QString("PID"),QString::number(nProcessId));
+    QString sTitle = QString("%1: %2").arg(QString("PID"), QString::number(nProcessId));
 
     setWindowTitle(sTitle);
 

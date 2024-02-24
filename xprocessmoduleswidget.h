@@ -36,39 +36,35 @@ namespace Ui {
 class XProcessModulesWidget;
 }
 
-class XProcessModulesWidget : public XShortcutsWidget
-{
+class XProcessModulesWidget : public XShortcutsWidget {
     Q_OBJECT
 
-    enum HEADER_COLUMN
-    {
-        HEADER_COLUMN_ADDRESS=0,
+    enum HEADER_COLUMN {
+        HEADER_COLUMN_ADDRESS = 0,
         HEADER_COLUMN_SIZE,
         HEADER_COLUMN_NAME,
         HEADER_COLUMN_FILENAME,
         __HEADER_COLUMN_size
     };
 
-    enum SC
-    {
-        SC_DUMPTOFILE=0,
+    enum SC {
+        SC_DUMPTOFILE = 0,
         SC_SHOWIN_FOLDER,
         __SC_SIZE
     };
 
-    enum USERROLE
-    {
-        USERROLE_SIZE=0,
+    enum USERROLE {
+        USERROLE_SIZE = 0,
         USERROLE_ADDRESS,
         USERROLE_FILENAME
     };
 
 public:
-    explicit XProcessModulesWidget(QWidget *pParent=nullptr);
+    explicit XProcessModulesWidget(QWidget *pParent = nullptr);
     ~XProcessModulesWidget();
 
-    void setData(qint64 nProcessId,bool bReload=true);
-    void setXInfoDB(XInfoDB *pXInfoDB,bool bReload=true);
+    void setData(qint64 nProcessId, bool bReload = true);
+    void setXInfoDB(XInfoDB *pXInfoDB, bool bReload = true);
     void reload();
 
 protected:
@@ -92,4 +88,4 @@ private:
     QShortcut *shortCuts[__SC_SIZE];
 };
 
-#endif // XPROCESSMODULESWIDGET_H
+#endif  // XPROCESSMODULESWIDGET_H

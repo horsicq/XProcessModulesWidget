@@ -27,12 +27,11 @@ namespace Ui {
 class DialogXProcessModules;
 }
 
-class DialogXProcessModules : public QDialog
-{
+class DialogXProcessModules : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DialogXProcessModules(QWidget *pParent=nullptr);
+    explicit DialogXProcessModules(QWidget *pParent = nullptr);
     ~DialogXProcessModules();
 
     void setData(qint64 nProcessId);
@@ -44,4 +43,4 @@ private:
     Ui::DialogXProcessModules *ui;
 };
 
-#endif // DIALOGXPROCESSMODULES_H
+#endif  // DIALOGXPROCESSMODULES_H
