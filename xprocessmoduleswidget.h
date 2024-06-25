@@ -67,6 +67,8 @@ public:
     void setXInfoDB(XInfoDB *pXInfoDB, bool bReload = true);
     void reload();
 
+    virtual void adjustView() {}
+
 protected:
     virtual void registerShortcuts(bool bState);
 
