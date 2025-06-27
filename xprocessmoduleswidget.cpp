@@ -196,9 +196,11 @@ void XProcessModulesWidget::_dumpToFileSlot()
             XProcess pd(g_nProcessId, nAddress, nSize);
 
             if (pd.open(QIODevice::ReadOnly)) {
-                DialogDumpProcess dd(this);
-                dd.setData(&pd, 0, nSize, sFileName, DumpProcess::DT_DUMP_DEVICE_OFFSET);
-
+                DumpProcess dumpProcess;
+                XDialogProcess dd(this, &dumpProcess);
+                dd.setGlobal(getShortcuts(), getGlobalOptions());
+                dumpProcess.setData(&pd, 0, nSize, sFileName, DumpProcess::DT_DUMP_DEVICE_OFFSET, dd.getPdStruct());
+                dd.start();
                 dd.showDialogDelay();
 
                 pd.close();

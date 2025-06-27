@@ -27,10 +27,11 @@
 #include <QDesktopServices>
 #include <QFuture>
 #include <QtConcurrent>
-#include "dialogdumpprocess.h"
 #include "xprocess.h"
 #include "xshortcutswidget.h"
 #include "xinfodb.h"
+#include "dumpprocess.h"
+#include "xdialogprocess.h"
 
 namespace Ui {
 class XProcessModulesWidget;
